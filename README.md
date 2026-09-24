@@ -4,15 +4,15 @@ Jogo de PC onde o jogador deve encontrar a saída de um **labirinto 3D gerado pr
 
 ## 🎮 Requisitos
 
-* [ ] Tela inicial com botão `PLAY`
-* [ ] Geração aleatória de labirintos
-* [ ] Labirinto criado visualmente através de código
-* [ ] Estilo 3D simplificado e monocromático
-* [ ] Movimento com `WASD` ou setas
-* [ ] Colisão com paredes
-* [ ] Detecção da saída
-* [ ] Vitória ao sair do labirinto
-* [ ] Possibilidade de iniciar uma nova partida
+* [x] Tela inicial com botão `PLAY`
+* [x] Geração aleatória de labirintos
+* [x] Labirinto criado visualmente através de código
+* [x] Estilo 3D simplificado e monocromático
+* [x] Movimento com `WASD` ou setas
+* [x] Colisão com paredes
+* [x] Detecção da saída
+* [x] Vitória ao sair do labirinto
+* [x] Possibilidade de iniciar uma nova partida
 
 ---
 
@@ -22,7 +22,7 @@ Jogo de PC onde o jogador deve encontrar a saída de um **labirinto 3D gerado pr
 
 * [x] Criar projeto
 * [x] Configurar janela/engine
-* [ ] Configurar controles (WASD, Setas, Esc)
+* [x] Configurar controles (WASD, Setas, Esc)
 * [x] Criar estrutura de pastas
 
 ---
@@ -31,59 +31,59 @@ Jogo de PC onde o jogador deve encontrar a saída de um **labirinto 3D gerado pr
 
 ### 🧩 Gerador de labirinto
 
-* [ ] Criar representação do mapa
-* [ ] Implementar geração procedural
-* [ ] Garantir entrada e saída
-* [ ] Garantir que exista um caminho válido
+* [x] Criar representação do mapa
+* [x] Implementar geração procedural
+* [x] Garantir entrada e saída
+* [x] Garantir que exista um caminho válido
 
 ### 🕹️ Jogador
 
-* [ ] Criar jogador
-* [ ] Implementar WASD
-* [ ] Implementar setas
-* [ ] Implementar colisões
+* [x] Criar jogador
+* [x] Implementar WASD
+* [x] Implementar setas
+* [x] Implementar colisões
 
 ### 🧱 Renderização
 
-* [ ] Gerar paredes através de código
-* [ ] Gerar chão e teto
-* [ ] Configurar câmera
-* [ ] Posicionar elementos de acordo com o mapa
+* [x] Gerar paredes através de código
+* [x] Gerar chão e teto
+* [x] Configurar câmera
+* [x] Posicionar elementos de acordo com o mapa
 
 ### 🎨 Visual
 
-* [ ] Definir estilo monocromático
-* [ ] Configurar materiais e iluminação
-* [ ] Ajustar câmera e aparência geral
+* [x] Definir estilo monocromático
+* [x] Configurar materiais e iluminação
+* [x] Ajustar câmera e aparência geral
 
 ### 🖥️ Menu
 
-* [ ] Criar tela inicial
-* [ ] Adicionar `PLAY`
-* [ ] Adicionar opção de sair
+* [x] Criar tela inicial
+* [x] Adicionar `PLAY`
+* [x] Adicionar opção de sair
 
 ---
 
 ## 3. Integração
 
-* [ ] Conectar o gerador à renderização
-* [ ] Criar um novo mapa ao iniciar uma partida
-* [ ] Posicionar o jogador na entrada
-* [ ] Implementar colisão com o mapa
-* [ ] Criar área de saída
-* [ ] Detectar quando o jogador chega à saída
-* [ ] Criar tela/mensagem de vitória
+* [x] Conectar o gerador à renderização
+* [x] Criar um novo mapa ao iniciar uma partida
+* [x] Posicionar o jogador na entrada
+* [x] Implementar colisão com o mapa
+* [x] Criar área de saída
+* [x] Detectar quando o jogador chega à saída
+* [x] Criar tela/mensagem de vitória
 
 ---
 
 ## 4. Polimento
 
-* [ ] Ajustar velocidade e controles
-* [ ] Ajustar tamanho dos labirintos
-* [ ] Melhorar iluminação e contraste
-* [ ] Corrigir bugs
-* [ ] Testar diferentes mapas e seeds
-* [ ] Verificar performance
+* [x] Ajustar velocidade e controles
+* [x] Ajustar tamanho dos labirintos
+* [x] Melhorar iluminação e contraste
+* [] Corrigir bugs
+* [] Testar diferentes mapas e seeds
+* [] Verificar performance
 
 ---
 
@@ -91,14 +91,14 @@ Jogo de PC onde o jogador deve encontrar a saída de um **labirinto 3D gerado pr
 
 Após o MVP estar completo:
 
-* [ ] Cronômetro
-* [ ] Pontuação
-* [ ] Diferentes dificuldades
-* [ ] Minimapa
-* [ ] Inimigo
-* [ ] Sons e música
-* [ ] Efeitos visuais
-* [ ] Menu de configurações
+* [x] Cronômetro
+* [x] Pontuação
+* [] Diferentes dificuldades
+* [] Minimapa
+* [] Inimigo
+* [] Sons e música
+* [] Efeitos visuais
+* [x] Menu de configurações
 
 ---
 
