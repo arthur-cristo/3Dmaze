@@ -317,7 +317,7 @@ public final class Game {
     }
   }
 
-  // ---------------------------------------------------------------- atualização
+  // ---------------------------------------------------------------- Movimentação
 
   private void update(float rawDt) {
     if (state != State.PLAYING) return;
@@ -325,10 +325,8 @@ public final class Game {
     float forward = 0, strafe = 0, turn = 0;
     if (down(GLFW_KEY_W) || down(GLFW_KEY_UP)) forward += 1;
     if (down(GLFW_KEY_S) || down(GLFW_KEY_DOWN)) forward -= 1;
-    if (down(GLFW_KEY_D)) strafe += 1;
-    if (down(GLFW_KEY_A)) strafe -= 1;
-    if (down(GLFW_KEY_RIGHT) || down(GLFW_KEY_E)) turn += 1;
-    if (down(GLFW_KEY_LEFT) || down(GLFW_KEY_Q)) turn -= 1;
+    if (down(GLFW_KEY_D) || down(GLFW_KEY_RIGHT)) strafe += 1;   
+    if (down(GLFW_KEY_A) || down(GLFW_KEY_LEFT)) strafe -= 1;                                
     boolean sprint = down(GLFW_KEY_LEFT_SHIFT) || down(GLFW_KEY_RIGHT_SHIFT);
 
     if (!timerRunning && (forward != 0 || strafe != 0)) timerRunning = true;
@@ -386,7 +384,7 @@ public final class Game {
     if (state == State.PLAYING && !timerRunning) {
       hud.textCentered("WASD / SETAS: MOVER   MOUSE: OLHAR   SHIFT: CORRER   ESC: PAUSA",
           vw / 2f, VH - 60f, 3f, 0.75f, 1f);
-      hud.textCentered("O TEMPO COMEÇA QUANDO VOCÊ SE MOVER", vw / 2f, VH - 34f, 3f, 0.5f, 1f);
+      hud.textCentered("O TEMPO COMEÇA QUANDO VOCE SE MOVER", vw / 2f, VH - 34f, 3f, 0.5f, 1f);
     }
   }
 
