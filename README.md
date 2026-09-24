@@ -95,7 +95,7 @@ Após o MVP estar completo:
 * [x] Pontuação
 * [] Diferentes dificuldades
 * [] Minimapa
-* [] Inimigo
+* [x] Inimigo
 * [] Sons e música
 * [] Efeitos visuais
 * [x] Menu de configurações
