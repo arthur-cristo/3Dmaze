@@ -3,7 +3,7 @@ package com.maze;
 /**
  * Inimigo perseguidor. Segue o menor caminho (BFS na grade de tiles) até o jogador, então
  * nunca atravessa paredes
- *
+ * velociadade do inimigo balanceada
  */
 public final class Enemy {
 
