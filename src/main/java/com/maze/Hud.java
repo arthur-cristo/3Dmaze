@@ -17,6 +17,11 @@ final class Hud implements AutoCloseable {
 
   private static final Map<Character, int[]> FONT = new HashMap<>();
 
+  /** Linhas (5 bits) do glifo de um caractere, ou null se não existir. */
+  static int[] glyphRows(char c) {
+    return FONT.get(c);
+  }
+
   private static void def(char c, int... rows) {
     FONT.put(c, rows);
   }
@@ -123,13 +128,18 @@ final class Hud implements AutoCloseable {
 
   /** Retângulo preenchido; g = tom de cinza (0..1), a = opacidade. */
   void rect(float x, float y, float w, float h, float g, float a) {
+    rect(x, y, w, h, g, g, g, a);
+  }
+
+  /** Retângulo preenchido com cor RGB (0..1). */
+  void rect(float x, float y, float w, float h, float r, float g, float b, float a) {
     ensure(6 * FLOATS_PER_VERTEX);
-    vertex(x, y, g, a);
-    vertex(x + w, y, g, a);
-    vertex(x + w, y + h, g, a);
-    vertex(x, y, g, a);
-    vertex(x + w, y + h, g, a);
-    vertex(x, y + h, g, a);
+    vertex(x, y, r, g, b, a);
+    vertex(x + w, y, r, g, b, a);
+    vertex(x + w, y + h, r, g, b, a);
+    vertex(x, y, r, g, b, a);
+    vertex(x + w, y + h, r, g, b, a);
+    vertex(x, y + h, r, g, b, a);
   }
 
   /** Contorno de retângulo com espessura t. */
@@ -145,28 +155,39 @@ final class Hud implements AutoCloseable {
   }
 
   void text(String s, float x, float y, float ps, float g, float a) {
+    text(s, x, y, ps, g, g, g, a);
+  }
+
+  /** Texto colorido (RGB 0..1). */
+  void text(String s, float x, float y, float ps, float r, float g, float b, float a) {
     s = s.toUpperCase(Locale.ROOT);
-    if (g > 0.5f) drawString(s, x + ps * 0.7f, y + ps * 0.7f, ps, 0f, a * 0.6f); // sombra
-    drawString(s, x, y, ps, g, a);
+    if (Math.max(r, Math.max(g, b)) > 0.5f) { // sombra
+      drawString(s, x + ps * 0.7f, y + ps * 0.7f, ps, 0f, 0f, 0f, a * 0.6f);
+    }
+    drawString(s, x, y, ps, r, g, b, a);
   }
 
   void textCentered(String s, float cx, float y, float ps, float g, float a) {
     text(s, cx - textWidth(s, ps) / 2f, y, ps, g, a);
   }
 
+  void textCentered(String s, float cx, float y, float ps, float r, float g, float b, float a) {
+    text(s, cx - textWidth(s, ps) / 2f, y, ps, r, g, b, a);
+  }
+
   void textRight(String s, float rx, float y, float ps, float g, float a) {
     text(s, rx - textWidth(s, ps), y, ps, g, a);
   }
 
-  private void drawString(String s, float x, float y, float ps, float g, float a) {
+  private void drawString(String s, float x, float y, float ps, float r, float g, float b, float a) {
     float cx = x;
     for (int i = 0; i < s.length(); i++) {
-      glyph(s.charAt(i), cx, y, ps, g, a);
+      glyph(s.charAt(i), cx, y, ps, r, g, b, a);
       cx += 6 * ps;
     }
   }
 
-  private void glyph(char c, float x, float y, float ps, float g, float a) {
+  private void glyph(char c, float x, float y, float ps, float r, float g, float b, float a) {
     char base = c;
     int accent = 0; // 1 agudo, 2 til, 3 cedilha
     switch (c) {
@@ -181,25 +202,27 @@ final class Hud implements AutoCloseable {
     }
     int[] rows = FONT.get(base);
     if (rows == null) return;
-    for (int r = 0; r < 7; r++) {
+    for (int row = 0; row < 7; row++) {
       for (int col = 0; col < 5; col++) {
-        if (((rows[r] >> (4 - col)) & 1) != 0) rect(x + col * ps, y + r * ps, ps, ps, g, a);
+        if (((rows[row] >> (4 - col)) & 1) != 0) {
+          rect(x + col * ps, y + row * ps, ps, ps, r, g, b, a);
+        }
       }
     }
     switch (accent) {
-      case 1 -> { px(x, y, ps, 3, -2, g, a); px(x, y, ps, 2, -1, g, a); }
-      case 2 -> { px(x, y, ps, 1, -1, g, a); px(x, y, ps, 2, -2, g, a); px(x, y, ps, 3, -1, g, a); }
-      case 3 -> { px(x, y, ps, 2, 7, g, a); px(x, y, ps, 1, 8, g, a); }
+      case 1 -> { px(x, y, ps, 3, -2, r, g, b, a); px(x, y, ps, 2, -1, r, g, b, a); }
+      case 2 -> { px(x, y, ps, 1, -1, r, g, b, a); px(x, y, ps, 2, -2, r, g, b, a); px(x, y, ps, 3, -1, r, g, b, a); }
+      case 3 -> { px(x, y, ps, 2, 7, r, g, b, a); px(x, y, ps, 1, 8, r, g, b, a); }
       default -> { }
     }
   }
 
-  private void px(float x, float y, float ps, int col, int row, float g, float a) {
-    rect(x + col * ps, y + row * ps, ps, ps, g, a);
+  private void px(float x, float y, float ps, int col, int row, float r, float g, float b, float a) {
+    rect(x + col * ps, y + row * ps, ps, ps, r, g, b, a);
   }
 
-  private void vertex(float x, float y, float g, float a) {
-    buf.put(x).put(y).put(g).put(g).put(g).put(a);
+  private void vertex(float x, float y, float r, float g, float b, float a) {
+    buf.put(x).put(y).put(r).put(g).put(b).put(a);
   }
 
   private void ensure(int floats) {

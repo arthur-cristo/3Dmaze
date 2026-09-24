@@ -6,11 +6,11 @@ import java.util.Arrays;
  * Gera a geometria do labirinto por código: chão, teto e paredes. Só cria as faces visíveis
  * (paredes voltadas para tiles livres), então a malha fica pequena mesmo em mapas grandes.
  *
- * Vértice: posição(3) + normal(3) + material(1). Materiais: 0 parede, 1 chão, 2 teto, 3 saída.
+ * Vértice: posição(3) + normal(3) + material(1). Materiais: 0 parede, 1 chão, 2 teto, 3 saída, 4 preto (letras).
  */
 final class MazeMeshBuilder {
 
-  static final float MAT_WALL = 0, MAT_FLOOR = 1, MAT_CEILING = 2, MAT_EXIT = 3;
+  static final float MAT_WALL = 0, MAT_FLOOR = 1, MAT_CEILING = 2, MAT_EXIT = 3, MAT_BLACK = 4;
 
   private float[] data = new float[1 << 16];
   private int len;
@@ -47,6 +47,35 @@ final class MazeMeshBuilder {
         if (m.isWall(tx, ty + 1)) {
           // Parede do fundo da saída brilha, marcando o objetivo.
           quad(x0, 0, z1, x1, 0, z1, x1, h, z1, x0, h, z1, 0, 0, -1, isExit ? MAT_EXIT : MAT_WALL);
+          if (isExit) exitLabel(x0, z1);
+        }
+      }
+    }
+  }
+
+  /**
+   * Escreve "SAIDA" em preto na parede do fundo da saída, com a fonte bitmap do HUD.
+   * Cada pixel aceso da fonte vira um quadradinho ligeiramente à frente da parede.
+   */
+  private void exitLabel(float x0, float z1) {
+    final String text = "SAIDA";
+    final float ps = 0.06f;        // tamanho de cada "pixel" da fonte, em unidades do mundo
+    final float z = z1 - 0.02f;    // um pouco à frente da parede (evita z-fighting)
+    final float width = (text.length() * 6 - 1) * ps;
+    final float height = 7 * ps;
+    // Quem entra na saída olha para +z, então a esquerda da tela é o lado de x maior.
+    final float left = x0 + Maze.TILE / 2f + width / 2f;
+    final float top = 1.45f + height / 2f;
+
+    for (int i = 0; i < text.length(); i++) {
+      int[] rows = Hud.glyphRows(text.charAt(i));
+      if (rows == null) continue;
+      for (int r = 0; r < 7; r++) {
+        for (int c = 0; c < 5; c++) {
+          if (((rows[r] >> (4 - c)) & 1) == 0) continue;
+          float xa = left - (i * 6 + c) * ps, xb = xa - ps;
+          float ya = top - r * ps, yb = ya - ps;
+          quad(xa, yb, z, xb, yb, z, xb, ya, z, xa, ya, z, 0, 0, -1, MAT_BLACK);
         }
       }
     }

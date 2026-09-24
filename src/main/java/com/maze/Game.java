@@ -325,8 +325,8 @@ public final class Game {
     float forward = 0, strafe = 0, turn = 0;
     if (down(GLFW_KEY_W) || down(GLFW_KEY_UP)) forward += 1;
     if (down(GLFW_KEY_S) || down(GLFW_KEY_DOWN)) forward -= 1;
-    if (down(GLFW_KEY_D) || down(GLFW_KEY_RIGHT)) strafe += 1;   
-    if (down(GLFW_KEY_A) || down(GLFW_KEY_LEFT)) strafe -= 1;                                
+    if (down(GLFW_KEY_D) || down(GLFW_KEY_RIGHT)) strafe += 1;
+    if (down(GLFW_KEY_A) || down(GLFW_KEY_LEFT)) strafe -= 1;
     boolean sprint = down(GLFW_KEY_LEFT_SHIFT) || down(GLFW_KEY_RIGHT_SHIFT);
 
     if (!timerRunning && (forward != 0 || strafe != 0)) timerRunning = true;
@@ -383,8 +383,9 @@ public final class Game {
 
     if (state == State.PLAYING && !timerRunning) {
       hud.textCentered("WASD / SETAS: MOVER   MOUSE: OLHAR   SHIFT: CORRER   ESC: PAUSA",
-          vw / 2f, VH - 60f, 3f, 0.75f, 1f);
-      hud.textCentered("O TEMPO COMEÇA QUANDO VOCE SE MOVER", vw / 2f, VH - 34f, 3f, 0.5f, 1f);
+          vw / 2f, VH - 60f, 3f, 1f, 0.85f, 0.1f, 1f);   // amarelo
+      hud.textCentered("O TEMPO COMEÇA QUANDO VOCE SE MOVER",
+          vw / 2f, VH - 34f, 3f, 1f, 0.85f, 0.1f, 1f);   // amarelo
     }
   }
 

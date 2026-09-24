@@ -85,9 +85,11 @@ final class SceneRenderer implements AutoCloseable {
           float line = min(step(f.x, 0.02) + step(f.y, 0.02), 1.0);
           albedo = 0.26 + (vnoise(uv * 6.0) - 0.5) * 0.06;
           albedo = mix(albedo, 0.08, line);
-        } else {                              // saída: emissiva, pulsa devagar
+        } else if (mat == 3) {                // saída: emissiva, pulsa devagar
           albedo = 1.0;
           emissive = 0.88 + 0.12 * sin(uTime * 3.0);
+        } else {                              // letras da saída: preto puro
+          albedo = 0.0;
         }
 
         // Lanterna do jogador
