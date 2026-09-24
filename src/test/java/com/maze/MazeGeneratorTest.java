@@ -73,4 +73,23 @@ class MazeGeneratorTest {
       }
     }
   }
+
+  @Test
+  void enemyCatchesAnIdlePlayerWithoutCrossingWalls() {
+    for (int seed = 0; seed < 20; seed++) {
+      Maze m = MazeGenerator.generate(14, 14, seed);
+      Player p = Player.atEntrance(m);
+      p.x = m.centerX(m.exitX); // jogador parado na saída, bem longe da entrada
+      p.z = m.centerZ(m.exitY);
+      Enemy e = Enemy.spawnAtEntrance(m);
+      boolean caught = false;
+      for (int i = 0; i < 20_000 && !caught; i++) { // até ~320 s simulados
+        e.update(0.016f, p, m);
+        assertFalse(m.isWall((int) Math.floor(e.x / Maze.TILE), (int) Math.floor(e.z / Maze.TILE)),
+            "inimigo dentro da parede (seed " + seed + ")");
+        caught = e.hasCaught(p);
+      }
+      assertTrue(caught, "inimigo não alcançou o jogador parado (seed " + seed + ")");
+    }
+  }
 }

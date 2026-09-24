@@ -19,7 +19,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
  */
 public final class Game {
 
-  private enum State { MENU, PLAYING, PAUSED, WON }
+  private enum State { MENU, PLAYING, PAUSED, WON, LOST }
 
   /** Altura da tela "virtual" do HUD; a largura acompanha a proporção da janela. */
   private static final float VH = 720f;
@@ -36,7 +36,9 @@ public final class Game {
   private State state = State.MENU;
   private SceneRenderer scene;
   private Hud hud;
-  private Menu mainMenu, pauseMenu, winMenu;
+  private Menu mainMenu, pauseMenu, winMenu, loseMenu;
+  private EnemyRenderer enemyRenderer;
+  private Enemy enemy;
 
   private Maze maze;
   private Player player;
@@ -114,6 +116,7 @@ public final class Game {
     System.out.println("OpenGL: " + glGetString(GL_VERSION));
 
     scene = new SceneRenderer();
+    enemyRenderer = new EnemyRenderer();
     hud = new Hud();
     buildMenus();
     setState(State.MENU);
@@ -142,6 +145,7 @@ public final class Game {
 
   private void shutdown() {
     if (hud != null) hud.close();
+    if (enemyRenderer != null) enemyRenderer.close();
     if (scene != null) scene.close();
     if (window != NULL) {
       Callbacks.glfwFreeCallbacks(window);
@@ -169,6 +173,10 @@ public final class Game {
     winMenu = new Menu(440f)
         .add(() -> "JOGAR NOVAMENTE", this::startGame)
         .add(() -> "MENU PRINCIPAL", () -> setState(State.MENU));
+
+    loseMenu = new Menu(400f)
+        .add(() -> "JOGAR NOVAMENTE", this::startGame)
+        .add(() -> "MENU PRINCIPAL", () -> setState(State.MENU));
   }
 
   private void cycleSize(int dir) {
@@ -181,6 +189,7 @@ public final class Game {
       case MENU -> mainMenu;
       case PAUSED -> pauseMenu;
       case WON -> winMenu;
+      case LOST -> loseMenu;
       case PLAYING -> null;
     };
   }
@@ -207,6 +216,7 @@ public final class Game {
     maze = MazeGenerator.generate(size.cells, size.cells, seed);
     scene.setMaze(maze);
     player = Player.atEntrance(maze);
+    enemy = null;
     elapsed = 0;
     timerRunning = false;
     newRecord = false;
@@ -220,6 +230,11 @@ public final class Game {
     double par = maze.shortestPath() * Maze.TILE / Player.WALK_SPEED * 1.6; // tempo "de referência"
     int bonus = (int) Math.round(Math.max(0.0, par - time) * 25.0);
     return base + bonus;
+  }
+
+  private void lose() {
+    System.out.printf(Locale.ROOT, "Derrota! O inimigo pegou o jogador aos %s%n", formatTime(elapsed));
+    setState(State.LOST);
   }
 
   private void win() {
@@ -317,7 +332,7 @@ public final class Game {
     }
   }
 
-  // ---------------------------------------------------------------- Movimentação
+  // ---------------------------------------------------------------- atualização
 
   private void update(float rawDt) {
     if (state != State.PLAYING) return;
@@ -327,14 +342,25 @@ public final class Game {
     if (down(GLFW_KEY_S) || down(GLFW_KEY_DOWN)) forward -= 1;
     if (down(GLFW_KEY_D) || down(GLFW_KEY_RIGHT)) strafe += 1;
     if (down(GLFW_KEY_A) || down(GLFW_KEY_LEFT)) strafe -= 1;
+    if (down(GLFW_KEY_E)) turn += 1;
+    if (down(GLFW_KEY_Q)) turn -= 1;
     boolean sprint = down(GLFW_KEY_LEFT_SHIFT) || down(GLFW_KEY_RIGHT_SHIFT);
 
     if (!timerRunning && (forward != 0 || strafe != 0)) timerRunning = true;
 
     player.update(Math.min(rawDt, MAX_DT), forward, strafe, turn, sprint, maze);
-    if (timerRunning) elapsed += rawDt;
+    float dt = Math.min(rawDt, MAX_DT);
+    if (timerRunning) {
+      elapsed += rawDt;
+      if (enemy == null && elapsed >= Enemy.SPAWN_DELAY) enemy = Enemy.spawnAtEntrance(maze);
+      if (enemy != null) enemy.update(dt, player, maze);
+    }
 
-    if (player.tileX() == maze.exitX && player.tileZ() == maze.exitY) win();
+    if (player.tileX() == maze.exitX && player.tileZ() == maze.exitY) {
+      win();
+    } else if (enemy != null && enemy.hasCaught(player)) {
+      lose();
+    }
   }
 
   // ---------------------------------------------------------------- desenho
@@ -346,6 +372,7 @@ public final class Game {
 
     if (state != State.MENU && maze != null) {
       scene.render(player, (float) fbW / fbH, (float) time);
+      if (enemy != null) enemyRenderer.render(enemy, player, scene.viewProj(), (float) time);
     }
 
     float vw = virtualWidth();
@@ -358,6 +385,7 @@ public final class Game {
         drawPause(vw);
       }
       case WON -> drawWin(vw);
+      case LOST -> drawLost(vw);
     }
     if (showDebug) drawDebug();
     hud.end();
@@ -386,6 +414,8 @@ public final class Game {
           vw / 2f, VH - 60f, 3f, 1f, 0.85f, 0.1f, 1f);   // amarelo
       hud.textCentered("O TEMPO COMEÇA QUANDO VOCE SE MOVER",
           vw / 2f, VH - 34f, 3f, 1f, 0.85f, 0.1f, 1f);   // amarelo
+      hud.textCentered("CUIDADO: O INIMIGO COMECA A TE PERSEGUIR ASSIM QUE VOCE SE MOVER!",
+          vw / 2f, VH - 86f, 3f, 1f, 0.85f, 0.1f, 1f);   // amarelo
     }
   }
 
@@ -393,6 +423,14 @@ public final class Game {
     hud.rect(0, 0, vw, VH, 0f, 0.65f);
     hud.textCentered("PAUSADO", vw / 2f, 130f, 12f, 1f, 1f);
     pauseMenu.draw(hud, vw);
+  }
+
+  private void drawLost(float vw) {
+    hud.rect(0, 0, vw, VH, 0f, 0.6f);
+    hud.textCentered("DERROTA", vw / 2f, 90f, 14f, 1f, 1f);
+    hud.textCentered("O INIMIGO PEGOU VOCE", vw / 2f, 220f, 5f, 1f, 1f);
+    hud.textCentered("TEMPO " + formatTime(elapsed), vw / 2f, 290f, 5f, 0.7f, 1f);
+    loseMenu.draw(hud, vw);
   }
 
   private void drawWin(float vw) {

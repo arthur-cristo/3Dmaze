@@ -59,6 +59,10 @@ final class Shader implements AutoCloseable {
     glUniform2f(loc(name), x, y);
   }
 
+  void setInt(String name, int v) {
+    glUniform1i(loc(name), v);
+  }
+
   void setFloat(String name, float v) {
     glUniform1f(loc(name), v);
   }

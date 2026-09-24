@@ -135,6 +135,11 @@ final class SceneRenderer implements AutoCloseable {
     exitZ = maze.centerZ(maze.exitY);
   }
 
+  /** Matriz projeção × visão do último quadro (usada por outros renderizadores). */
+  Matrix4f viewProj() {
+    return viewProj;
+  }
+
   int vertexCount() {
     return mesh == null ? 0 : mesh.vertexCount();
   }
